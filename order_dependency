@@ -1,0 +1,35 @@
+public class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] incLinks = new int[numCourses];
+        List<List<Integer>> adjs = new ArrayList<List<Integer>>(numCourses);
+        initialGraph(incLinks, adjs, prerequisites);
+        return solveByDFS(incLinks, adjs);
+    }
+    public void initialGraph(int[] incLinks, List<List<Integer>> adjs, int[][] prerequisites){
+        int n = incLinks.length;
+        while(n-- > 0) adjs.add(new ArrayList<Integer>());
+        for(int edge[]: prerequisites){
+            incLinks[edge[0]]++;
+            adjs.get(edge[1]).add(edge[0]);
+        }
+    }
+    
+    public int[] solveByDFS(int[] incLinks, List<List<Integer>> adjs){
+        int[] order = new int[incLinks.length];
+        Queue<Integer> toVisit = new ArrayDeque<>();
+        for(int i=0; i<incLinks.length; i++){
+            if(incLinks[i] == 0)    toVisit.offer(i);
+        }
+        int visited = 0;
+        while(!toVisit.isEmpty()){
+            int from = toVisit.poll();
+            order[visited++] = from;
+            for(int to: adjs.get(from)){
+                incLinks[to]--;
+                if(incLinks[to] == 0)
+                    toVisit.offer(to);
+            }
+        }
+        return visited == incLinks.length ? order : new int[0];
+    }
+}
